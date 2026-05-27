@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Student</title>
+
+    <style>
+
+        body{
+            font-family:Arial;
+            background:#0f172a;
+            color:white;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+        }
+
+        .container{
+            background:#1e293b;
+            padding:40px;
+            border-radius:10px;
+            width:400px;
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:20px;
+        }
+
+        input{
+            width:100%;
+            padding:12px;
+            margin-top:10px;
+            border:none;
+            border-radius:5px;
+        }
+
+        button{
+            width:100%;
+            padding:12px;
+            margin-top:20px;
+            border:none;
+            border-radius:5px;
+            background:orange;
+            color:white;
+            font-size:18px;
+            cursor:pointer;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Edit Student</h1>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <input type="text"
+                   name="name"
+                   value="{{ student.name }}">
+
+            <input type="text"
+                   name="usn"
+                   value="{{ student.usn }}">
+
+            <input type="text"
+                   name="department"
+                   value="{{ student.department }}">
+
+            <input type="number"
+                   name="semester"
+                   value="{{ student.semester }}">
+
+            <button type="submit">Update Student</button>
+
+        </form>
+
+    </div>
+
+</body>
+</html>

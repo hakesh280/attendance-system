@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance Percentage</title>
+
+    <style>
+
+        body{
+            font-family:Arial;
+            background:#0f172a;
+            color:white;
+            padding:40px;
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            background:#1e293b;
+        }
+
+        th,td{
+            padding:15px;
+            border:1px solid #334155;
+            text-align:center;
+        }
+
+        th{
+            background:orange;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Attendance Percentage</h1>
+
+    <table>
+
+        <tr>
+            <th>Student Name</th>
+            <th>Attendance %</th>
+        </tr>
+
+        {% for item in data %}
+
+        <tr>
+
+            <td>{{ item.name }}</td>
+
+            <td>{{ item.percentage }}%</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</body>
+</html>
