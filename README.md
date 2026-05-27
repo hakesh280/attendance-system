@@ -1,1 +1,3 @@
-"# attendance-system" 
+# attendance-system
+
+Simple attendance system project.
