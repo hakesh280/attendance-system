@@ -3,13 +3,15 @@ from .models import Student
 from .models import Attendance
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 
 def home(request):
     return render(request, 'attendance/index.html')
 
-
+@login_required
+@staff_member_required
 def add_student(request):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -23,8 +25,9 @@ def add_student(request):
             department=department,
             semester=semester,
         )
-
     return render(request, 'attendance/add_student.html')
+@login_required
+@staff_member_required
 def mark_attendance(request):
 
     students = Student.objects.all()
@@ -52,9 +55,18 @@ def attendance_report(request):
 
     attendance_data = Attendance.objects.all()
 
-    return render(request, 'attendance/attendance_report.html', {
-        'attendance_data': attendance_data
-    })
+    date = request.GET.get('date')
+
+    if date:
+        attendance_data = attendance_data.filter(date=date)
+
+    return render(
+        request,
+        'attendance/attendance_report.html',
+        {
+            'attendance_data': attendance_data
+        }
+    )
 def attendance_percentage(request):
 
     students = Student.objects.all()
@@ -129,7 +141,8 @@ def student_list(request):
                       'students': students
                   })
 
-
+@login_required
+@staff_member_required
 def delete_student(request, id):
 
     student = Student.objects.get(id=id)
@@ -137,6 +150,8 @@ def delete_student(request, id):
     student.delete()
 
     return redirect('/student-list/')
+@login_required
+@staff_member_required
 def edit_student(request, id):
 
     student = Student.objects.get(id=id)
@@ -185,3 +200,9 @@ def login_page(request):
                           {'error': 'Invalid Username or Password'})
 
     return render(request, 'attendance/login.html')
+@login_required(login_url='/login/')
+def user_logout(request):
+
+    logout(request)
+
+    return redirect('/login/')

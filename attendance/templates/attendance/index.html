@@ -95,33 +95,45 @@ nav ul li a:hover{
 
         <div>
 
-            <a href="/"
-               class="btn btn-outline-light mx-1">
-               Home
-            </a>
+    <a href="/" class="btn btn-outline-light mx-1">
+        Home
+    </a>
 
-            <a href="/add-student/"
-               class="btn btn-outline-light mx-1">
-               Add Student
-            </a>
+    <a href="/student-list/" class="btn btn-outline-light mx-1">
+        Students
+    </a>
 
-            <a href="/student-list/"
-               class="btn btn-outline-light mx-1">
-               Students
-            </a>
+    <a href="/attendance-report/" class="btn btn-outline-light mx-1">
+        Attendance Report
+    </a>
 
-            <a href="/mark-attendance/"
-               class="btn btn-outline-light mx-1">
-               Attendance
-            </a>
+    {% if user.is_authenticated and user.is_staff %}
 
-            <a href="/dashboard/"
-               class="btn btn-warning mx-1">
-               Dashboard
-            </a>
+        <a href="/add-student/" class="btn btn-outline-light mx-1">
+            Add Student
+        </a>
 
-        </div>
+        <a href="/mark-attendance/" class="btn btn-outline-light mx-1">
+            Mark Attendance
+        </a>
 
+        <a href="/dashboard/" class="btn btn-warning mx-1">
+            Dashboard
+        </a>
+
+        <a href="/logout/" class="btn btn-danger mx-1">
+            Logout
+        </a>
+
+    {% else %}
+
+        <a href="/login/" class="btn btn-success mx-1">
+            Admin Login
+        </a>
+
+    {% endif %}
+
+</div>
     </nav>
 
     <div class="container text-center mt-5">
@@ -134,12 +146,21 @@ nav ul li a:hover{
             Manage students and attendance using Django
         </p>
 
-        <a href="/dashboard/"
-           class="btn btn-warning btn-lg mt-4">
+        {% if user.is_authenticated and user.is_staff %}
 
-           Open Dashboard
+<a href="/dashboard/"
+   class="btn btn-warning btn-lg mt-4">
+   Open Dashboard
+</a>
 
-        </a>
+{% else %}
+
+<a href="/student-list/"
+   class="btn btn-success btn-lg mt-4">
+   View Students
+</a>
+
+{% endif %}
 
     </div>
 
