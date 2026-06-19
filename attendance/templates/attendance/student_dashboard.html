@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - Attendance System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4"><i class="fas fa-chart-line"></i> My Dashboard</h1>
+    
+    <!-- Greeting -->
+    <div class="alert alert-success" role="alert">
+        <h4 class="alert-heading">Welcome, {{ student.name }}!</h4>
+        <p>Roll Number: <strong>{{ student.roll_number }}</strong> | Department: <strong>{{ student.department }}</strong> | Semester: <strong>{{ student.semester }}</strong></p>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{% url 'attendance_percentage' %}" class="card stat-card stat-card-blue text-decoration-none">
+                <h6><i class="fas fa-percentage"></i> Attendance %</h6>
+                <h2>{{ attendance_percentage }}%</h2>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{% url 'attendance_report' %}" class="card stat-card stat-card-green text-decoration-none">
+                <h6><i class="fas fa-check-circle"></i> Classes Attended</h6>
+                <h2>{{ attended_classes }}</h2>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{% url 'attendance_report' %}" class="card stat-card stat-card-orange text-decoration-none">
+                <h6><i class="fas fa-book"></i> Total Classes</h6>
+                <h2>{{ total_classes }}</h2>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{% url 'notifications' %}" class="card stat-card text-decoration-none" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <h6><i class="fas fa-bell"></i> Notifications</h6>
+                <h2>{{ unread_notifications }}</h2>
+            </a>
+        </div>
+    </div>
+
+    <!-- Attendance Status Alert -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            {% if attendance_percentage >= 75 %}
+                <div class="alert alert-success" role="alert">
+                    <i class="fas fa-check-circle"></i> <strong>Good!</strong> Your attendance is above 75%. Keep it up!
+                </div>
+            {% else %}
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> <strong>Warning!</strong> Your attendance is below 75%. Please maintain better attendance.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Today's Attendance -->
+    {% if today_attendance %}
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar-day"></i> Today's Attendance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Period</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for attendance in today_attendance %}
+                                <tr>
+                                    <td>{{ attendance.subject.subject_name }}</td>
+                                    <td>{{ attendance.period }}</td>
+                                    <td>
+                                        {% if attendance.status == 'Present' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check"></i> Present
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times"></i> Absent
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ attendance.date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Notifications -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-bell"></i> Notifications ({{ unread_notifications }} unread)</h5>
+                </div>
+                <div class="card-body">
+                    {% if notifications %}
+                        <div class="list-group">
+                            {% for notification in notifications %}
+                            <a href="{% url 'notifications' %}" class="list-group-item list-group-item-action {% if not notification.is_read %}active{% endif %}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ notification.title }}</h6>
+                                    <small>{{ notification.created_at|date:"M d, g:i A" }}</small>
+                                </div>
+                                <p class="mb-1">{{ notification.message|truncatewords:15 }}</p>
+                                <small>
+                                    <span class="badge bg-{% if notification.is_read %}secondary{% else %}primary{% endif %}">
+                                        {% if notification.is_read %}Read{% else %}New{% endif %}
+                                    </span>
+                                </small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No notifications yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <h5 class="mb-3">Quick Actions</h5>
+            <a href="{% url 'attendance_percentage' %}" class="btn btn-primary me-2">
+                <i class="fas fa-percentage"></i> View Attendance %
+            </a>
+            <a href="{% url 'attendance_report' %}" class="btn btn-info me-2">
+                <i class="fas fa-calendar-check"></i> Attendance Report
+            </a>
+            <a href="{% url 'notifications' %}" class="btn btn-warning">
+                <i class="fas fa-bell"></i> All Notifications
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

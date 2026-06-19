@@ -1,66 +1,199 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Attendance Percentage</title>
+{% extends 'base.html' %}
 
-    <style>
+{% block title %}Attendance Percentage - Attendance System{% endblock %}
 
-        body{
-            font-family:Arial;
-            background:#0f172a;
-            color:white;
-            padding:40px;
-        }
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4"><i class="fas fa-percentage"></i> Attendance Percentage</h1>
 
-        h1{
-            text-align:center;
-            margin-bottom:30px;
-        }
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Overall Attendance</h6>
+                    <h2 class="text-primary">{{ attendance_percentage }}%</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Classes Attended</h6>
+                    <h2 class="text-success">{{ adjusted_attended }}</h2>
+                    {% if adjustment_count %}
+                        <small class="text-muted">Includes {{ adjustment_count }} approved adjustment(s)</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Classes</h6>
+                    <h2 class="text-info">{{ adjusted_total }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        table{
-            width:100%;
-            border-collapse:collapse;
-            background:#1e293b;
-        }
+    {% if attendance_percentage < 75 %}
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-circle"></i> <strong>Warning!</strong> Your attendance is below 75%. Please attend more classes.
+        </div>
+    {% elif attendance_percentage < 85 %}
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> <strong>Caution!</strong> Your attendance is between 75-85%. Try to improve.
+        </div>
+    {% else %}
+        <div class="alert alert-success" role="alert">
+            <i class="fas fa-check-circle"></i> <strong>Great!</strong> Your attendance is excellent.
+        </div>
+    {% endif %}
 
-        th,td{
-            padding:15px;
-            border:1px solid #334155;
-            text-align:center;
-        }
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Subject-wise Attendance</h5>
+        </div>
+        <div class="card-body">
+            {% if subject_attendance %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject Name</th>
+                                <th>Total Classes</th>
+                                <th>Classes Attended</th>
+                                <th>Percentage</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject in subject_attendance %}
+                            <tr>
+                                <td>{{ subject.subject__subject_name }}</td>
+                                <td>{{ subject.total }}</td>
+                                <td>{{ subject.present }}</td>
+                                <td>
+                                    {% if subject.total > 0 %}
+                                        {{ subject.percentage }}%
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if subject.total > 0 %}
+                                        {% if subject.percentage >= 75 %}
+                                            <span class="badge bg-success">Good</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Poor</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted">No attendance records yet.</p>
+            {% endif %}
+        </div>
+    </div>
 
-        th{
-            background:orange;
-        }
+    <div class="card mt-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-calendar-week"></i> Week-wise Attendance</h5>
+        </div>
+        <div class="card-body">
+            {% if weeks %}
+                {% for week in weeks %}
+                    <div class="mb-4">
+                        <h6 class="text-muted">{{ week.start|date:"M d, Y" }} to {{ week.end|date:"M d, Y" }}</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for day_key, day in week.days.items %}
+                                <a href="{% url 'attendance_percentage' %}?day={{ day.date|date:'Y-m-d' }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-calendar-day"></i>
+                                    {{ day.date|date:"D, M d" }}
+                                    <span class="badge bg-secondary">{{ day.present }}/{{ day.total }}</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted mb-0">No weekly attendance records yet.</p>
+            {% endif %}
+        </div>
+    </div>
 
-    </style>
+    {% if selected_day %}
+    <div class="card mt-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-calendar-day"></i> Attendance for {{ selected_day }}</h5>
+        </div>
+        <div class="card-body">
+            {% if day_attendance %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Period</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in day_attendance %}
+                            <tr>
+                                <td>{{ item.subject.subject_name }}</td>
+                                <td>{{ item.period }}</td>
+                                <td>
+                                    {% if item.status == 'Present' %}
+                                        <span class="badge bg-success">Present</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Absent</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted mb-0">No attendance was marked for this day.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 
-</head>
-
-<body>
-
-    <h1>Attendance Percentage</h1>
-
-    <table>
-
-        <tr>
-            <th>Student Name</th>
-            <th>Attendance %</th>
-        </tr>
-
-        {% for item in data %}
-
-        <tr>
-
-            <td>{{ item.name }}</td>
-
-            <td>{{ item.percentage }}%</td>
-
-        </tr>
-
-        {% endfor %}
-
-    </table>
-
-</body>
-</html>
+    {% if adjustments %}
+    <div class="card mt-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0"><i class="fas fa-scale-balanced"></i> Approved Adjustments</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Count</th>
+                            <th>Opinion</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for adjustment in adjustments %}
+                        <tr>
+                            <td><span class="badge bg-warning text-dark">+{{ adjustment.attendance_count }}</span></td>
+                            <td>{{ adjustment.opinion }}</td>
+                            <td>{{ adjustment.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

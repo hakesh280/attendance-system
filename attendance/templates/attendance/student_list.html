@@ -1,116 +1,77 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student List</title>
+{% extends 'base.html' %}
 
-    <style>
+{% block title %}Student List - Attendance System{% endblock %}
 
-        body{
-            font-family:Arial;
-            background:#0f172a;
-            color:white;
-            padding:40px;
-        }
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-users"></i> Student List</h1>
+        <a href="{% url 'add_student' %}" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Add New Student
+        </a>
+    </div>
 
-        h1{
-            text-align:center;
-            margin-bottom:30px;
-        }
-
-        table{
-            width:100%;
-            border-collapse:collapse;
-            background:#1e293b;
-        }
-
-        th,td{
-            padding:15px;
-            border:1px solid #334155;
-            text-align:center;
-        }
-
-        th{
-            background:orange;
-        }
-
-        a{
-            text-decoration:none;
-            color:white;
-            background:red;
-            padding:8px 15px;
-            border-radius:5px;
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-    <h1>Student List</h1>
-    <form method="GET" style="margin-bottom:20px;">
-
-    <input type="text"
-           name="q"
-           placeholder="Search Student"
-           style="padding:10px;
-                  width:300px;
-                  border:none;
-                  border-radius:5px;">
-
-    <button type="submit"
-            style="padding:10px 20px;
-                   background:orange;
-                   border:none;
-                   color:white;
-                   border-radius:5px;">
-
-        Search
-
-    </button>
-
-</form>
-
-    <table>
-
-        <tr>
-            <th>Name</th>
-            <th>USN</th>
-            <th>Department</th>
-            <th>Semester</th>
-            <th>Action</th>
-        </tr>
-
-        {% for student in students %}
-
-        <tr>
-
-            <td>{{ student.name }}</td>
-
-            <td>{{ student.usn }}</td>
-
-            <td>{{ student.department }}</td>
-
-            <td>{{ student.semester }}</td>
-
-           <td>
-
-    <a href="/edit-student/{{ student.id }}"
-       style="background:orange;">
-        Edit
-    </a>
-
-    <a href="/delete-student/{{ student.id }}">
-        Delete
-    </a>
-
-</td>
-
-        </tr>
-
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         {% endfor %}
+    {% endif %}
 
-    </table>
-
-</body>
-</html>
+    <div class="card">
+        <div class="card-body">
+            {% if students %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Roll Number</th>
+                                <th>Department</th>
+                                <th>Semester</th>
+                                <th>Username</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>
+                                    <strong>{{ student.name }}</strong>
+                                </td>
+                                <td>{{ student.roll_number }}</td>
+                                <td>{{ student.department }}</td>
+                                <td>{{ student.semester }}</td>
+                                <td><code>{{ student.user.username }}</code></td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'edit_student' student.id %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'change_student_password' student.id %}" class="btn btn-sm btn-secondary">
+                                            <i class="fas fa-key"></i> Password
+                                        </a>
+                                        {% if user.is_staff or user.is_superuser %}
+                                            <a href="{% url 'delete_student' student.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-muted mt-3">Total: <strong>{{ students|length }}</strong> students</p>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No students found. <a href="{% url 'add_student' %}">Add one now</a>.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

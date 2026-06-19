@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Staff - Attendance System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-user-plus"></i> Add Staff</h1>
+        <a href="{% url 'staff_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Staff
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-id-card"></i> Staff Login and Subject Handling</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="name">Staff Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="department">Department</label>
+                        <input type="text" class="form-control" id="department" name="department" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="designation">Designation</label>
+                        <input type="text" class="form-control" id="designation" name="designation" value="Teacher">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                </div>
+
+                <h5 class="mt-3 mb-3"><i class="fas fa-book"></i> Handled Subjects</h5>
+                <div id="assignmentRows">
+                {% for row in assignment_rows %}
+                    <div class="row">
+                        <div class="col-md-5 mb-3">
+                            <select class="form-select" name="assignment_subject">
+                                <option value="">Select subject</option>
+                                {% for subject in subjects %}
+                                    <option value="{{ subject.id }}">{{ subject.subject_name }} (Sem {{ subject.semester }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <input type="text" class="form-control" name="assignment_department" placeholder="Department / Class">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="number" min="1" max="8" class="form-control" name="assignment_semester" placeholder="Semester">
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+
+                <button type="button" class="btn btn-outline-primary btn-sm mb-3" id="addAssignmentRow">
+                    <i class="fas fa-plus"></i> Add Subject
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create Staff Login
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('addAssignmentRow').addEventListener('click', function () {
+    const rows = document.getElementById('assignmentRows');
+    const firstRow = rows.querySelector('.row');
+    const clone = firstRow.cloneNode(true);
+    clone.querySelectorAll('input, select').forEach(function (field) {
+        field.value = '';
+    });
+    rows.appendChild(clone);
+});
+</script>
+{% endblock %}

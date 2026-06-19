@@ -1,79 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Student</title>
+{% extends 'base.html' %}
 
-    <style>
+{% block title %}Add Student - Attendance System{% endblock %}
 
-        body{
-            font-family:Arial;
-            background:#1e293b;
-            color:white;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
-        }
-
-        .container{
-            background:#334155;
-            padding:40px;
-            border-radius:10px;
-            width:400px;
-        }
-
-        h1{
-            text-align:center;
-            margin-bottom:20px;
-        }
-
-        input{
-            width:100%;
-            padding:12px;
-            margin-top:10px;
-            border:none;
-            border-radius:5px;
-        }
-
-        button{
-            width:100%;
-            padding:12px;
-            margin-top:20px;
-            border:none;
-            border-radius:5px;
-            background:orange;
-            color:white;
-            font-size:18px;
-            cursor:pointer;
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-    <div class="container">
-
-        <h1>Add Student</h1>
-
-        <form method="POST">
-
-            {% csrf_token %}
-
-            <input type="text" name="name" placeholder="Student Name">
-
-            <input type="text" name="usn" placeholder="USN">
-
-            <input type="text" name="department" placeholder="Department">
-
-            <input type="number" name="semester" placeholder="Semester">
-
-            <button type="submit">Save Student</button>
-
-        </form>
-
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-user-plus"></i> Add Student</h1>
+        <a href="{% url 'student_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Students
+        </a>
     </div>
 
-</body>
-</html>
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-id-card"></i> Student Login Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">Student Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="roll_number" class="form-label">Roll Number / USN</label>
+                        <input type="text" class="form-control" id="roll_number" name="roll_number" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="department" class="form-label">Department</label>
+                        <input type="text" class="form-control" id="department" name="department" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="semester" class="form-label">Semester</label>
+                        <input type="number" min="1" max="8" class="form-control" id="semester" name="semester" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="username" class="form-label">Student Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="password" class="form-label">Student Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create Student Login
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

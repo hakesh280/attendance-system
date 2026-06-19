@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Attendance Management System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+        
+        body {
+            background-color: #ecf0f1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .navbar .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            transition: color 0.3s;
+        }
+        
+        .navbar .nav-link:hover {
+            color: #fff !important;
+        }
+        
+        .sidebar {
+            background-color: var(--primary-color);
+            color: white;
+            min-height: 100vh;
+            padding-top: 20px;
+        }
+        
+        .sidebar a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar a:hover, .sidebar a.active {
+            background-color: rgba(255,255,255,0.1);
+            border-left-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .main-content {
+            padding: 30px 20px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+            border-radius: 10px;
+            color: white;
+        }
+        
+        .stat-card h6 {
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card h2 {
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .stat-card-blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stat-card-green {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stat-card-orange {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .stat-card-red {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .badge-success {
+            background-color: var(--success-color);
+        }
+        
+        .badge-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .badge-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+        
+        .user-menu {
+            background-color: rgba(0,0,0,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .user-menu .user-info {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 10px;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            color: white;
+        }
+        
+        .user-role {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #27ae60;
+            margin-right: 5px;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+                padding-top: 10px;
+            }
+            
+            .main-content {
+                padding: 20px 10px;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'dashboard' %}">
+                <i class="fas fa-graduation-cap"></i> Attendance System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    {% if user.is_staff or user.is_superuser or user.staff_profile %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'add_student' %}">
+                            <i class="fas fa-user-plus"></i> Add Student
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'mark_attendance' %}">
+                            <i class="fas fa-clipboard-check"></i> Mark Attendance
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% if user.is_staff or user.is_superuser %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'staff_list' %}">
+                            <i class="fas fa-chalkboard-user"></i> Staff
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'day_schedule' %}">
+                            <i class="fas fa-calendar-days"></i> Schedule
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'attendance_report' %}">
+                            <i class="fas fa-calendar-check"></i> Attendance Report
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'notifications' %}">
+                            <i class="fas fa-bell"></i> Notifications
+                            {% if unread_notifications %}
+                                <span class="badge bg-danger">{{ unread_notifications }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle"></i> {{ user.first_name|default:user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Messages -->
+    {% if messages and user.is_authenticated %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="row">
+            {% if user.is_authenticated %}
+            <div class="col-lg-2 col-md-3 sidebar d-none d-md-block">
+                <div class="user-menu">
+                    <div class="user-info">
+                        <div class="user-name">
+                            <span class="status-badge"></span>{{ user.first_name|default:user.username }}
+                        </div>
+                        <div class="user-role">
+                            {% if user.is_superuser or user.is_staff %}
+                                <i class="fas fa-crown"></i> Administrator
+                            {% elif user.staff_profile %}
+                                <i class="fas fa-chalkboard-user"></i> Staff
+                            {% elif user.student_profile %}
+                                <i class="fas fa-book"></i> Student
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    {% if user.is_superuser or user.is_staff %}
+                        <a href="{% url 'admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                            <i class="fas fa-chart-line"></i> Admin Dashboard
+                        </a>
+                        <a href="{% url 'student_list' %}" class="{% if request.resolver_match.url_name == 'student_list' %}active{% endif %}">
+                            <i class="fas fa-users"></i> Students
+                        </a>
+                        <a href="{% url 'add_student' %}" class="{% if request.resolver_match.url_name == 'add_student' %}active{% endif %}">
+                            <i class="fas fa-user-plus"></i> Add Student
+                        </a>
+                        <a href="{% url 'staff_list' %}" class="{% if request.resolver_match.url_name == 'staff_list' %}active{% endif %}">
+                            <i class="fas fa-chalkboard-user"></i> Staff
+                        </a>
+                        <a href="{% url 'day_schedule' %}" class="{% if request.resolver_match.url_name == 'day_schedule' %}active{% endif %}">
+                            <i class="fas fa-calendar-days"></i> Day Schedule
+                        </a>
+                        <a href="{% url 'attendance_report' %}" class="{% if request.resolver_match.url_name == 'attendance_report' %}active{% endif %}">
+                            <i class="fas fa-calendar-check"></i> Attendance Report
+                        </a>
+                        <a href="/admin/">
+                            <i class="fas fa-cog"></i> Admin Panel
+                        </a>
+                    {% elif user.staff_profile %}
+                        <a href="{% url 'staff_dashboard' %}" class="{% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                        <a href="{% url 'student_list' %}" class="{% if request.resolver_match.url_name == 'student_list' %}active{% endif %}">
+                            <i class="fas fa-users"></i> Students
+                        </a>
+                        <a href="{% url 'mark_attendance' %}" class="{% if request.resolver_match.url_name == 'mark_attendance' %}active{% endif %}">
+                            <i class="fas fa-clipboard-check"></i> Mark Attendance
+                        </a>
+                        <a href="{% url 'attendance_report' %}" class="{% if request.resolver_match.url_name == 'attendance_report' %}active{% endif %}">
+                            <i class="fas fa-calendar-check"></i> Attendance Report
+                        </a>
+                    {% elif user.student_profile %}
+                        <a href="{% url 'student_dashboard' %}" class="{% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                        <a href="{% url 'attendance_percentage' %}" class="{% if request.resolver_match.url_name == 'attendance_percentage' %}active{% endif %}">
+                            <i class="fas fa-percentage"></i> Attendance %
+                        </a>
+                        <a href="{% url 'attendance_report' %}" class="{% if request.resolver_match.url_name == 'attendance_report' %}active{% endif %}">
+                            <i class="fas fa-calendar-check"></i> My Attendance
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="{% if user.is_authenticated %}col-lg-10 col-md-9 col-12 main-content{% else %}col-12 p-0{% endif %}">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    {% if user.is_authenticated %}
+    <footer>
+        <p>&copy; 2026 Attendance Management System. All rights reserved.</p>
+    </footer>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

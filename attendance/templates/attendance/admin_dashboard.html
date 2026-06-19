@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Attendance System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4"><i class="fas fa-chart-line"></i> Admin Dashboard</h1>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{% url 'student_list' %}" class="card stat-card stat-card-blue text-decoration-none">
+                <h6><i class="fas fa-users"></i> Total Students</h6>
+                <h2>{{ total_students }}</h2>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{% url 'staff_list' %}" class="card stat-card stat-card-green text-decoration-none">
+                <h6><i class="fas fa-chalkboard-user"></i> Total Staff</h6>
+                <h2>{{ total_staff }}</h2>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{% url 'day_schedule' %}" class="card stat-card stat-card-orange text-decoration-none">
+                <h6><i class="fas fa-book"></i> Total Subjects</h6>
+                <h2>{{ total_subjects }}</h2>
+            </a>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <a href="{% url 'attendance_report' %}" class="card stat-card stat-card-red text-decoration-none">
+                <h6><i class="fas fa-calendar-check"></i> Today's Attendance</h6>
+                <h2>{{ today_attendance }}</h2>
+            </a>
+        </div>
+    </div>
+
+    <!-- Second Row of Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Students Below 75% Attendance</h5>
+                </div>
+                <div class="card-body">
+                    {% if students_below_75 %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Roll Number</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in students_below_75 %}
+                                    <tr>
+                                        <td>{{ item.student.name }}</td>
+                                        <td>{{ item.student.roll_number }}</td>
+                                        <td>
+                                            <span class="badge bg-danger">{{ item.percentage }}%</span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No students below 75% attendance.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-calendar-times"></i> Students Absent 4+ Days</h5>
+                </div>
+                <div class="card-body">
+                    {% if students_absent_4_days %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Roll Number</th>
+                                        <th>Department</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students_absent_4_days %}
+                                    <tr>
+                                        <td>{{ student.name }}</td>
+                                        <td>{{ student.roll_number }}</td>
+                                        <td>{{ student.department }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No students with 4+ day absence.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Notifications -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-bell"></i> Recent Notifications ({{ unread_notifications }} unread)</h5>
+                </div>
+                <div class="card-body">
+                    {% if notifications %}
+                        <div class="list-group">
+                            {% for notification in notifications %}
+                            <a href="{% url 'notifications' %}" class="list-group-item list-group-item-action {% if not notification.is_read %}active{% endif %}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ notification.title }}</h6>
+                                    <small>{{ notification.created_at|date:"M d, g:i A" }}</small>
+                                </div>
+                                <p class="mb-1">{{ notification.message|truncatewords:15 }}</p>
+                                <small>
+                                    {% if notification.is_read %}
+                                        <span class="badge bg-secondary">Read</span>
+                                    {% else %}
+                                        <span class="badge bg-primary">New</span>
+                                    {% endif %}
+                                </small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No notifications.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h5 class="mb-3">Quick Actions</h5>
+            <a href="{% url 'add_student' %}" class="btn btn-primary me-2">
+                <i class="fas fa-user-plus"></i> Add Student
+            </a>
+            <a href="{% url 'add_staff' %}" class="btn btn-secondary me-2">
+                <i class="fas fa-chalkboard-user"></i> Add Staff
+            </a>
+            <a href="{% url 'day_schedule' %}" class="btn btn-dark me-2">
+                <i class="fas fa-calendar-days"></i> Day Schedule
+            </a>
+            <a href="{% url 'mark_attendance' %}" class="btn btn-success me-2">
+                <i class="fas fa-clipboard-check"></i> Mark Attendance
+            </a>
+            <a href="{% url 'student_list' %}" class="btn btn-info me-2">
+                <i class="fas fa-users"></i> View Students
+            </a>
+            <a href="{% url 'attendance_report' %}" class="btn btn-warning">
+                <i class="fas fa-calendar-check"></i> Attendance Report
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,93 +1,101 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Mark Attendance</title>
+{% extends 'base.html' %}
 
-    <style>
+{% block title %}Mark Attendance - Attendance System{% endblock %}
 
-        body{
-            font-family:Arial;
-            background:#0f172a;
-            color:white;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
-        }
-
-        .container{
-            background:#1e293b;
-            padding:40px;
-            border-radius:10px;
-            width:400px;
-        }
-
-        h1{
-            text-align:center;
-            margin-bottom:20px;
-        }
-
-        select,input{
-            width:100%;
-            padding:12px;
-            margin-top:10px;
-            border:none;
-            border-radius:5px;
-        }
-
-        button{
-            width:100%;
-            padding:12px;
-            margin-top:20px;
-            border:none;
-            border-radius:5px;
-            background:orange;
-            color:white;
-            font-size:18px;
-            cursor:pointer;
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-    <div class="container">
-
-        <h1>Mark Attendance</h1>
-
-        <form method="POST">
-
-            {% csrf_token %}
-
-            <select name="student">
-
-                {% for student in students %}
-
-                    <option value="{{ student.id }}">
-                        {{ student.name }}
-                    </option>
-
-                {% endfor %}
-
-            </select>
-
-            <input type="date" name="date">
-
-            <select name="status">
-
-                <option value="Present">Present</option>
-
-                <option value="Absent">Absent</option>
-
-            </select>
-
-            <button type="submit">Save Attendance</button>
-
-        </form>
-
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-clipboard-check"></i> Mark Attendance</h1>
+        <a href="{% url 'attendance_report' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-calendar-check"></i> Report
+        </a>
     </div>
 
-</body>
-</html>
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-list-check"></i> Select Date, Class, and Period</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row align-items-end">
+                <div class="col-md-3 mb-3">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" class="form-control" id="date" name="date" value="{{ selected_date }}" required>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="class" class="form-label">Class</label>
+                    <select class="form-select" id="class" name="class" required>
+                        <option value="">Select class</option>
+                        {% for class_option in class_options %}
+                            <option value="{{ class_option.value }}" {% if selected_class == class_option.value %}selected{% endif %}>
+                                {{ class_option.department }} - Semester {{ class_option.semester }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="schedule" class="form-label">Period / Subject</label>
+                    <select class="form-select" id="schedule" name="schedule" required>
+                        <option value="">Select scheduled period</option>
+                        {% for schedule in schedules %}
+                            <option value="{{ schedule.id }}" {% if selected_schedule_id|stringformat:"s" == schedule.id|stringformat:"s" %}selected{% endif %}>
+                                {{ schedule.period }} - {{ schedule.subject.subject_name }} ({{ schedule.staff.name }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-arrow-right"></i> Continue
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-user-check"></i> Student Attendance</h5>
+        </div>
+        <div class="card-body">
+            {% if selected_schedule %}
+                <div class="alert alert-info">
+                    <strong>{{ selected_schedule.department }} Semester {{ selected_schedule.semester }}</strong>
+                    | {{ selected_schedule.date }} | {{ selected_schedule.period }}
+                    | {{ selected_schedule.subject.subject_name }}
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="date" value="{{ selected_date }}">
+                    <input type="hidden" name="class" value="{{ selected_class }}">
+                    <input type="hidden" name="schedule" value="{{ selected_schedule.id }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="student" class="form-label">Student</label>
+                            <select class="form-select" id="student" name="student" required>
+                                <option value="">Select student</option>
+                                {% for student in students %}
+                                    <option value="{{ student.id }}">{{ student.name }} - {{ student.roll_number }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-save"></i> Save Attendance
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                <p class="text-muted mb-0">Select a date, class, and scheduled period to mark attendance.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

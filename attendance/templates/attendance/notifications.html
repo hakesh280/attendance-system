@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - Attendance System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-bell"></i> Notifications</h1>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-lg-8">
+            {% if notifications %}
+                <div class="list-group">
+                    {% for notification in notifications %}
+                    <a href="#" class="list-group-item list-group-item-action {% if not notification.is_read %}active{% endif %} mb-2 p-3">
+                        <div class="d-flex w-100 justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="mb-1">
+                                    {% if notification.notification_type == 'attendance_marked' %}
+                                        <i class="fas fa-check-circle text-success"></i>
+                                    {% elif notification.notification_type == 'absent_3_days' %}
+                                        <i class="fas fa-exclamation-circle text-warning"></i>
+                                    {% elif notification.notification_type == 'absent_4_days' %}
+                                        <i class="fas fa-times-circle text-danger"></i>
+                                    {% elif notification.notification_type == 'low_attendance' %}
+                                        <i class="fas fa-arrow-down text-warning"></i>
+                                    {% else %}
+                                        <i class="fas fa-info-circle text-info"></i>
+                                    {% endif %}
+                                    {{ notification.title }}
+                                </h5>
+                                <p class="mb-1">{{ notification.message }}</p>
+                                <small class="text-muted">{{ notification.created_at|date:"M d, Y g:i A" }}</small>
+                            </div>
+                            <span class="badge bg-{% if notification.is_read %}secondary{% else %}primary{% endif %}">
+                                {% if notification.is_read %}Read{% else %}New{% endif %}
+                            </span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> You have no notifications at this time.
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Notification Types</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6><i class="fas fa-check-circle text-success"></i> Attendance Marked</h6>
+                        <small class="text-muted">Notification when your attendance is marked</small>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <h6><i class="fas fa-exclamation-circle text-warning"></i> Absent 3 Days</h6>
+                        <small class="text-muted">Alert for 3 consecutive absences</small>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <h6><i class="fas fa-times-circle text-danger"></i> Absent 4 Days</h6>
+                        <small class="text-muted">Critical alert for 4 consecutive absences</small>
+                    </div>
+                    <hr>
+                    <div>
+                        <h6><i class="fas fa-arrow-down text-warning"></i> Low Attendance</h6>
+                        <small class="text-muted">Warning when attendance drops below 75%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

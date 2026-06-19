@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Staff - Attendance System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-user-pen"></i> Edit Staff</h1>
+        <a href="{% url 'staff_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Staff
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-id-card"></i> Staff Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="name">Staff Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ staff.name }}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="department">Department</label>
+                        <input type="text" class="form-control" id="department" name="department" value="{{ staff.department }}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="designation">Designation</label>
+                        <input type="text" class="form-control" id="designation" name="designation" value="{{ staff.designation }}">
+                    </div>
+                </div>
+
+                <h5 class="mt-3 mb-3"><i class="fas fa-book"></i> Handled Subjects</h5>
+                <div id="assignmentRows">
+                {% for assignment in assignments %}
+                    <div class="row">
+                        <div class="col-md-5 mb-3">
+                            <select class="form-select" name="assignment_subject">
+                                <option value="">Select subject</option>
+                                {% for subject in subjects %}
+                                    <option value="{{ subject.id }}" {% if assignment and assignment.subject.id == subject.id %}selected{% endif %}>
+                                        {{ subject.subject_name }} (Sem {{ subject.semester }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <input type="text" class="form-control" name="assignment_department" placeholder="Department / Class" value="{% if assignment %}{{ assignment.department }}{% endif %}">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <input type="number" min="1" max="8" class="form-control" name="assignment_semester" placeholder="Semester" value="{% if assignment %}{{ assignment.semester }}{% endif %}">
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+
+                <button type="button" class="btn btn-outline-primary btn-sm mb-3" id="addAssignmentRow">
+                    <i class="fas fa-plus"></i> Add Subject
+                </button>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Staff
+                    </button>
+                    <a href="{% url 'change_staff_password' staff.id %}" class="btn btn-warning">
+                        <i class="fas fa-key"></i> Change Password
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('addAssignmentRow').addEventListener('click', function () {
+    const rows = document.getElementById('assignmentRows');
+    const firstRow = rows.querySelector('.row');
+    const clone = firstRow.cloneNode(true);
+    clone.querySelectorAll('input, select').forEach(function (field) {
+        field.value = '';
+    });
+    rows.appendChild(clone);
+});
+</script>
+{% endblock %}
