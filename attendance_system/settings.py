@@ -28,24 +28,25 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'insecure-local-secret-change-me')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = [host.strip() for host in os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if host.strip()]
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get(
+    'ALLOWED_HOSTS',
+    'attendance-system-xz8y.onrender.com,127.0.0.1,localhost',
+).split(',') if host.strip()]
+
+# During development and tests, include the Django test client host so internal requests work
+if DEBUG:
+    if 'testserver' not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append('testserver')
 
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # Only use in production with reverse proxy
 
-if not DEBUG:
-    SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False').lower() in ('1', 'true', 'yes')
-    SESSION_COOKIE_SECURE = SECURE_SSL_REDIRECT
-    CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
-    SECURE_HSTS_SECONDS = 31536000 if SECURE_SSL_REDIRECT else 0
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_SSL_REDIRECT
-    SECURE_HSTS_PRELOAD = SECURE_SSL_REDIRECT
-else:
-    SECURE_SSL_REDIRECT = False
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
-    SECURE_HSTS_SECONDS = 0
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-    SECURE_HSTS_PRELOAD = False
+# Unconditionally disable HTTPS redirect and HSTS to prevent local loop issues
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SECURE_HSTS_SECONDS = 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
 
 
 # Application definition
